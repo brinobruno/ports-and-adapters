@@ -29,25 +29,23 @@ func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 }
 
 func (p *ProductDb) Save(product application.ProductInterface) (application.ProductInterface, error) {
-	var rows int
-	p.db.QueryRow("select id from products where id=?", product.GetId()).Scan(&rows)
-	if rows == 0 {
-		_, err := p.create(product)
-		if err != nil {
-			return nil, err
-		}
+	var existingID string
+	err := p.db.QueryRow("select id from products where id=?", product.GetId()).Scan(&existingID)
+
+	if err == sql.ErrNoRows {
+		return p.create(product)
+	} else if err != nil {
+		return nil, err
 	} else {
-		_, err := p.update(product)
-		if err != nil {
-			return nil, err
-		}
+		return p.update(product)
 	}
-	return product, nil
 }
 
 func (p *ProductDb) update(product application.ProductInterface) (application.ProductInterface, error) {
-	_, err := p.db.Exec("update products set name=?, price=?, status=? where id ?",
-		product.GetName(), product.GetPrice(), product.GetStatus(), product.GetId())
+	_, err := p.db.Exec(
+		"update products set name=?, price=?, status=? where id=?",
+		product.GetName(), product.GetPrice(), product.GetStatus(), product.GetId(),
+	)
 	if err != nil {
 		return nil, err
 	}
