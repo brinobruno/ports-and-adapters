@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 
-	db2 "github.com/codeedu/go-hexagonal/adapters/db"
-	"github.com/codeedu/go-hexagonal/application"
+	db2 "github.com/brinobruno/ports-and-adapters/adapters/db"
+	"github.com/brinobruno/ports-and-adapters/application"
 	_ "github.com/mattn/go-sqlite3"
 )
 

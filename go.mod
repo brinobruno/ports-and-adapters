@@ -1,4 +1,4 @@
-module github.com/codeedu/go-hexagonal
+module github.com/brinobruno/ports-and-adapters
 
 go 1.19
 

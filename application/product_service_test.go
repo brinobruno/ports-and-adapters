@@ -3,8 +3,8 @@ package application_test
 import (
 	"testing"
 
-	"github.com/codeedu/go-hexagonal/application"
-	mock_application "github.com/codeedu/go-hexagonal/application/mocks"
+	"github.com/brinobruno/ports-and-adapters/application"
+	mock_application "github.com/brinobruno/ports-and-adapters/application/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
