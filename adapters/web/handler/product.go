@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/brinobruno/ports-and-adapters/adapters/dto"
 	"github.com/brinobruno/ports-and-adapters/application"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -17,6 +18,10 @@ func MakeProductHandlers(
 	r.Handle("/products/{id}", n.With(
 		negroni.Wrap(getProduct(service)),
 	)).Methods("GET", "OPTIONS")
+
+	r.Handle("/products", n.With(
+		negroni.Wrap(createProduct(service)),
+	)).Methods("POST")
 }
 
 func getProduct(service application.ProductServiceInterface) http.Handler {
@@ -32,6 +37,31 @@ func getProduct(service application.ProductServiceInterface) http.Handler {
 		err = json.NewEncoder(w).Encode(product)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+func createProduct(service application.ProductServiceInterface) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var productDTO dto.Product
+		err := json.NewDecoder(r.Body).Decode(&productDTO)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		product, err := service.Create(productDTO.Name, productDTO.Price)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		err = json.NewEncoder(w).Encode(product)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(jsonError(err.Error()))
 			return
 		}
 	})
